@@ -7,7 +7,11 @@ import arcjet, {
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { env } from "./data/env/server";
 
-const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/"]);
+const isPublicRoute = createRouteMatcher([
+  "/sign-in(.*)",
+  "/",
+  "/api/webhooks(.*)",
+]);
 
 const aj = arcjet({
   // TODO: add ts for env vars
@@ -27,16 +31,6 @@ const aj = arcjet({
         "CATEGORY:PREVIEW", // Link previews e.g. Slack, Discord
       ],
     }),
-    // Create a token bucket rate limit. Other algorithms are supported.
-    tokenBucket({
-      mode: "LIVE",
-      // Tracked by IP address by default, but this can be customized
-      // See https://docs.arcjet.com/fingerprints
-      //characteristics: ["ip.src"],
-      refillRate: 5, // Refill 5 tokens per interval
-      interval: 10, // Refill every 10 seconds
-      capacity: 10, // Bucket capacity of 10 tokens
-    }),
     slidingWindow({
       mode: "LIVE",
       interval: "1m",
@@ -46,7 +40,7 @@ const aj = arcjet({
 });
 
 export default clerkMiddleware(async (auth, req) => {
-  const decision = await aj.protect(req, { requested: 5 }); // Deduct 5 tokens from the bucket
+  const decision = await aj.protect(req);
 
   if (decision.isDenied()) {
     return new Response(null, { status: 403 });
