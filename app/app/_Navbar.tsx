@@ -27,7 +27,7 @@ export function Navbar() {
     <nav className="h-header border-b flex items-center justify-between container">
       {/* Left side - Logo and App Name */}
       <Link href="/app" className="flex items-center gap-2">
-        <BrainCircuitIcon className="size-6 text-primary h-8 w-8" />
+        <BrainCircuitIcon className="size-6 text-primary" />
         <span className="text-xl font-bold">Landr</span>
       </Link>
 
@@ -44,12 +44,12 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleProfile}>
-                <User className="mr-2 h-4 w-4" />
+                <User className="mr-2" />
                 Profile
               </DropdownMenuItem>
               <SignOutButton>
                 <DropdownMenuItem>
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2" />
                   Logout
                 </DropdownMenuItem>
               </SignOutButton>

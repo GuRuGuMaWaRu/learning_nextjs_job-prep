@@ -8,13 +8,13 @@ export default function UserAvatar({
   user: UserResource | null | undefined;
 }) {
   const initials = user
-    ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
+    ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`
     : "?";
 
   return (
     <Avatar>
       <AvatarImage src={user?.imageUrl} alt={user?.fullName || ""} />
-      <AvatarFallback>{initials}</AvatarFallback>
+      <AvatarFallback className="uppercase">{initials}</AvatarFallback>
     </Avatar>
   );
 }
