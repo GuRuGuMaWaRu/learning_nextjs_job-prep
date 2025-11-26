@@ -1,0 +1,20 @@
+import type { UserResource } from "@clerk/types";
+
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
+export default function UserAvatar({
+  user,
+}: {
+  user: UserResource | null | undefined;
+}) {
+  const initials = user
+    ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
+    : "?";
+
+  return (
+    <Avatar>
+      <AvatarImage src={user?.imageUrl} alt={user?.fullName || ""} />
+      <AvatarFallback>{initials}</AvatarFallback>
+    </Avatar>
+  );
+}

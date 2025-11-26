@@ -3,7 +3,7 @@ import { Outfit } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 
 import { ClerkProvider } from "@/services/clerk/components/ClerkProvider";
-import ThemeToggle from "@/components/ui/ThemeToggle";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
 const geistSans = Outfit({
@@ -31,9 +31,6 @@ export default function RootLayout({
             enableColorScheme
             disableTransitionOnChange
             value={{ light: "light", dark: "dark" }}>
-            <header className="flex justify-end p-4">
-              <ThemeToggle />
-            </header>
             {children}
           </ThemeProvider>
         </body>
