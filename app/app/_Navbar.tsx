@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import ThemeToggle from "@/components/ThemeToggle";
-import UserAvatar from "@/components/UserAvatar";
+import UserAvatar from "@/features/users/components/UserAvatar";
 import { Button } from "@/components/ui/button";
 
 export function Navbar() {

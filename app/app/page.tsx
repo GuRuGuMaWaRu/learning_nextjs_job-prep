@@ -1,13 +1,24 @@
 import { Suspense } from "react";
-import { Loader2Icon } from "lucide-react";
+import { ArrowRightIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import { desc, eq } from "drizzle-orm";
 import { cacheTag } from "next/cache";
+import Link from "next/link";
 
-import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser";
 import { db } from "@/drizzle/db";
 import { JobInfoTable } from "@/drizzle/schema";
+import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser";
 import { getJobInfoIdTag } from "@/features/jobInfos/dbCache";
-import { Card, CardContent } from "@/components/ui/card";
+import JobInfoForm from "@/features/jobInfos/components/JobInfoForm";
+import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function AppPage() {
   return (
@@ -33,16 +44,58 @@ async function JobInfos() {
   }
 
   return (
-    <div className="container py-8">
-      <h1 className="text-2xl font-bold mb-4">Welcome to the App Page</h1>
-      <ul className="space-y-2">
-        {jobInfos.map((job: any) => (
-          <li key={job.jobId} className="p-4 border rounded-lg">
-            <h2 className="text-xl font-semibold">{job.title}</h2>
-            <p>Job ID: {job.jobId}</p>
-          </li>
+    <div className="container my-4">
+      <div className="flex gap-2 justify-between mb-6">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl">
+          Select a job description
+        </h1>
+        <Button asChild>
+          <Link href="/app/job-infos/new">
+            <PlusIcon />
+            Create Job Description
+          </Link>
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 has-hover:*:not-hover:opacity-70">
+        {jobInfos.map((jobInfo) => (
+          <Link
+            className="hover:scale-[1.02] transition-[transform_opacity]"
+            href={`/app/job-infos/${jobInfo.id}`}
+            key={jobInfo.id}>
+            <Card className="h-full">
+              <div className="flex items-center justify-between h-full">
+                <div className="space-y-4 h-full">
+                  <CardHeader>
+                    <CardTitle className="text-lg">{jobInfo.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-muted-foreground line-clamp-3">
+                    {jobInfo.description}
+                  </CardContent>
+                  <CardFooter className="flex gap-2">
+                    <Badge variant="outline">
+                      {formatExperienceLevel(jobInfo.experienceLevel)}
+                    </Badge>
+                    {jobInfo.title && (
+                      <Badge variant="outline">{jobInfo.title}</Badge>
+                    )}
+                  </CardFooter>
+                </div>
+                <CardContent>
+                  <ArrowRightIcon className="size-6" />
+                </CardContent>
+              </div>
+            </Card>
+          </Link>
         ))}
-      </ul>
+        <Link className="transition-opacity" href="/app/job-infos/new">
+          <Card className="h-full flex items-center justify-center border-dashed border-3 bg-transparent hover:border-primary/50 transition-colors shadow-none">
+            <div className="text-lg flex items-center gap-2">
+              <PlusIcon className="size-6" />
+              New Job Description
+            </div>
+          </Card>
+        </Link>
+      </div>
     </div>
   );
 }
@@ -62,7 +115,9 @@ function NoJobInfos() {
       </p>
 
       <Card className="p-6 border-dashed border-2 border-muted">
-        <CardContent>{/* <JobInfoForm /> */}</CardContent>
+        <CardContent>
+          <JobInfoForm />
+        </CardContent>
       </Card>
     </div>
   );

@@ -13,7 +13,13 @@ export function getJobInfoIdTag(id: string) {
   return getIdTag(id, "jobInfos");
 }
 
-export function revalidateJobInfoCache(id: string, userId: string) {
+export function revalidateJobInfoCache({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: string;
+}) {
   revalidateTag(getJobInfoGlobalTag(), "max");
   revalidateTag(getJobInfoUserTag(userId), "max");
   revalidateTag(getJobInfoIdTag(id), "max");

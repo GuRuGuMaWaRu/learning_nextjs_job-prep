@@ -3,7 +3,7 @@ import { Outfit } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 
 import { ClerkProvider } from "@/services/clerk/components/ClerkProvider";
-import ThemeToggle from "@/components/ThemeToggle";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Outfit({
@@ -32,6 +32,7 @@ export default function RootLayout({
             disableTransitionOnChange
             value={{ light: "light", dark: "dark" }}>
             {children}
+            <Toaster position="top-right" />
           </ThemeProvider>
         </body>
       </html>
