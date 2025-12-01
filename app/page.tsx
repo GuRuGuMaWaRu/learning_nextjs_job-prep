@@ -1,3 +1,4 @@
+import { PricingTable } from "@/core/services/clerk/components/ClerkPricingTable";
 import {
   SignInButton,
   SignUpButton,
@@ -11,6 +12,7 @@ export default function HomePage() {
     <>
       <SignInButton />
       <UserButton />
+      <PricingTable />
     </>
   );
 }
