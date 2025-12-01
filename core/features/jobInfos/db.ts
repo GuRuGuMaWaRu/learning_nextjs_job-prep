@@ -42,6 +42,15 @@ export async function getJobInfo(id: string, userId: string) {
   });
 }
 
+export async function getJobInfoById(id: string) {
+  "use cache";
+  cacheTag(getJobInfoIdTag(id));
+
+  return db.query.JobInfoTable.findFirst({
+    where: eq(JobInfoTable.id, id),
+  });
+}
+
 export async function getJobInfos(userId: string) {
   "use cache";
   cacheTag(getJobInfoIdTag(userId));

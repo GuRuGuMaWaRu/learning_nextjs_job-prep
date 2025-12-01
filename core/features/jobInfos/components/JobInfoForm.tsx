@@ -42,7 +42,7 @@ export default function JobInfoForm({
 }) {
   const form = useForm<JobInfoFormData>({
     resolver: zodResolver(jobInfoSchema),
-    defaultValues: {
+    defaultValues: jobInfo ?? {
       name: "",
       title: null,
       experienceLevel: "junior",
