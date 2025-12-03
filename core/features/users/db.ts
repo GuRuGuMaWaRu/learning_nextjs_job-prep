@@ -16,3 +16,11 @@ export async function upsertUser(user: typeof UserTable.$inferInsert) {
 export async function deleteUser(id: string) {
   await db.delete(UserTable).where(eq(UserTable.id, id));
 }
+
+export async function getUserById(id: string) {
+  const user = await db.query.UserTable.findFirst({
+    where: eq(UserTable.id, id),
+  });
+
+  return user;
+}
