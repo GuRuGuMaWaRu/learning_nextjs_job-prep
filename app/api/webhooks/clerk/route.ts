@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 
-import { deleteUser, upsertUser } from "@/core/features/users/db";
+import { deleteUserDb, upsertUserDb } from "@/core/features/users/db";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
           });
         }
 
-        await upsertUser({
+        await upsertUserDb({
           id: clerkData.id,
           email: email,
           name: `${clerkData.first_name} ${clerkData.last_name}`,
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
           return new Response("No user id found", { status: 400 });
         }
 
-        await deleteUser(event.data.id);
+        await deleteUserDb(event.data.id);
         break;
     }
   } catch {

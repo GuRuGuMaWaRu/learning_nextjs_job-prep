@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/core/components/ui/card";
-import { getJobInfo } from "@/core/features/jobInfos/db";
+import { getJobInfoDb } from "@/core/features/jobInfos/db";
 import { formatExperienceLevel } from "@/core/features/jobInfos/lib/formatters";
 import { getCurrentUser } from "@/core/services/clerk/lib/getCurrentUser";
 import { SuspendedItem } from "@/core/components/SuspendedItem";
@@ -53,7 +53,7 @@ export default async function JobInfoPage({
     async ({ userId, redirectToSignIn }) => {
       if (userId == null) return redirectToSignIn();
 
-      const jobInfo = await getJobInfo(jobInfoId, userId);
+      const jobInfo = await getJobInfoDb(jobInfoId, userId);
       if (jobInfo == null) return notFound();
 
       return jobInfo;

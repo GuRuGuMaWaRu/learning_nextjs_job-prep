@@ -3,10 +3,13 @@ import { cacheTag } from "next/cache";
 
 import { db } from "@/core/drizzle/db";
 import { InterviewTable } from "@/core/drizzle/schema";
-import { getInterviewIdTag, revalidateInterviewCache } from "./dbCache";
-import { getJobInfoIdTag } from "../jobInfos/dbCache";
+import {
+  getInterviewIdTag,
+  revalidateInterviewCache,
+} from "@/core/features/interviews/dbCache";
+import { getJobInfoIdTag } from "@/core/features/jobInfos/dbCache";
 
-export async function getInterviewById(id: string, userId: string) {
+export async function getInterviewByIdDb(id: string, userId: string) {
   "use cache";
   cacheTag(getInterviewIdTag(id));
 
@@ -32,7 +35,7 @@ export async function getInterviewById(id: string, userId: string) {
   return interview;
 }
 
-export async function insertInterview(
+export async function insertInterviewDb(
   interview: typeof InterviewTable.$inferInsert
 ) {
   const [newInterview] = await db

@@ -1,8 +1,12 @@
 "use server";
 
 import { getCurrentUser } from "@/core/services/clerk/lib/getCurrentUser";
-import { getJobInfo } from "../jobInfos/db";
-import { getInterviewById, insertInterview, updateInterviewDb } from "./db";
+import { getJobInfoDb } from "@/core/features/jobInfos/db";
+import {
+  getInterviewByIdDb,
+  insertInterviewDb,
+  updateInterviewDb,
+} from "@/core/features/interviews/db";
 
 type CreateInterviewReturn = Promise<
   | {
@@ -32,7 +36,7 @@ export async function createInterview({
   // TODO: Permissions
   // TODO: Rate limit
 
-  const jobInfo = await getJobInfo(jobInfoId, userId);
+  const jobInfo = await getJobInfoDb(jobInfoId, userId);
   if (jobInfo == null) {
     return {
       error: true,
@@ -40,7 +44,10 @@ export async function createInterview({
     };
   }
 
-  const interview = await insertInterview({ jobInfoId, duration: "00:00:00" });
+  const interview = await insertInterviewDb({
+    jobInfoId,
+    duration: "00:00:00",
+  });
 
   return {
     error: false,
@@ -60,7 +67,7 @@ export async function updateInterview(
     };
   }
 
-  const foundInterview = await getInterviewById(id, userId);
+  const foundInterview = await getInterviewByIdDb(id, userId);
   if (foundInterview == null) {
     return {
       error: true,
