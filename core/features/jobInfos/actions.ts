@@ -13,7 +13,10 @@ import {
   getJobInfosDb,
 } from "@/core/features/jobInfos/db";
 import { jobInfoSchema } from "@/core/features/jobInfos/schemas";
-import { getJobInfoIdTag } from "@/core/features/jobInfos/dbCache";
+import {
+  getJobInfoGlobalTag,
+  getJobInfoIdTag,
+} from "@/core/features/jobInfos/dbCache";
 
 export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
   const { userId } = await getCurrentUser();
@@ -86,7 +89,7 @@ export async function getJobInfoById(id: string) {
 
 export async function getJobInfos(userId: string) {
   "use cache";
-  cacheTag(getJobInfoIdTag(userId));
+  cacheTag(getJobInfoGlobalTag());
 
   return await getJobInfosDb(userId);
 }
