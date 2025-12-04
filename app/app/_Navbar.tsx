@@ -1,8 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
 import { SignOutButton, useAuth, useClerk } from "@clerk/nextjs";
-import { BrainCircuitIcon, LogOut, User } from "lucide-react";
+import {
+  BookOpenIcon,
+  BrainCircuitIcon,
+  FileSlidersIcon,
+  LogOut,
+  SpeechIcon,
+  User,
+} from "lucide-react";
 
 import {
   DropdownMenu,
@@ -12,10 +20,19 @@ import {
 } from "@core/components/ui/dropdown-menu";
 import ThemeToggle from "@core/components/ThemeToggle";
 import UserAvatar from "@/core/features/users/components/UserAvatar";
+import { Button } from "@/core/components/ui/button";
+
+const navLinks = [
+  { name: "Interviews", href: "interviews", Icon: SpeechIcon },
+  { name: "Questions", href: "questions", Icon: BookOpenIcon },
+  { name: "Resume", href: "resume", Icon: FileSlidersIcon },
+];
 
 export function Navbar({ user }: { user: { name: string; image: string } }) {
   const { userId } = useAuth();
   const { openUserProfile } = useClerk();
+  const { jobInfoId } = useParams();
+  const pathName = usePathname();
 
   const handleProfile = () => {
     openUserProfile();
@@ -31,6 +48,25 @@ export function Navbar({ user }: { user: { name: string; image: string } }) {
 
       {/* Right side - Theme Toggle and User Menu */}
       <div className="flex items-center gap-4">
+        {typeof jobInfoId === "string"
+          ? navLinks.map(({ name, href, Icon }) => {
+              const hrefPath = `/app/job-infos/${jobInfoId}/${href}`;
+
+              return (
+                <Button
+                  variant={pathName === hrefPath ? "secondary" : "ghost"}
+                  key={name}
+                  asChild
+                  className="cursor-pointer max-sm:hidden">
+                  <Link href={hrefPath}>
+                    <Icon />
+                    {name}
+                  </Link>
+                </Button>
+              );
+            })
+          : null}
+
         <ThemeToggle />
 
         {userId && (
