@@ -5,11 +5,11 @@ import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/core/services/clerk/lib/getCurrentUser";
 import {
-  getJobInfo,
-  insertJobInfo,
-  updateJobInfo as updateJobInfoDb,
-} from "./db";
-import { jobInfoSchema } from "./schemas";
+  getJobInfoDb,
+  insertJobInfoDb,
+  updateJobInfoDb,
+} from "@/core/features/jobInfos/db";
+import { jobInfoSchema } from "@/core/features/jobInfos/schemas";
 
 export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
   const { userId } = await getCurrentUser();
@@ -28,7 +28,7 @@ export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
     };
   }
 
-  const jobInfo = await insertJobInfo({ ...data, userId });
+  const jobInfo = await insertJobInfoDb({ ...data, userId });
 
   redirect(`/app/job-infos/${jobInfo.id}`);
 }
@@ -53,7 +53,7 @@ export async function updateJobInfo(
     };
   }
 
-  const existingJobInfo = await getJobInfo(id, userId);
+  const existingJobInfo = await getJobInfoDb(id, userId);
   if (existingJobInfo == null) {
     return {
       error: true,

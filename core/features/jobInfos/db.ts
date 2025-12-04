@@ -1,10 +1,16 @@
+import { cacheTag } from "next/cache";
+import { and, desc, eq } from "drizzle-orm";
+
 import { db } from "@/core/drizzle/db";
 import { JobInfoTable } from "@/core/drizzle/schema";
-import { getJobInfoIdTag, revalidateJobInfoCache } from "./dbCache";
-import { and, desc, eq } from "drizzle-orm";
-import { cacheTag } from "next/cache";
+import {
+  getJobInfoIdTag,
+  revalidateJobInfoCache,
+} from "@/core/features/jobInfos/dbCache";
 
-export async function insertJobInfo(jobInfo: typeof JobInfoTable.$inferInsert) {
+export async function insertJobInfoDb(
+  jobInfo: typeof JobInfoTable.$inferInsert
+) {
   const [newJobInfo] = await db.insert(JobInfoTable).values(jobInfo).returning({
     id: JobInfoTable.id,
     userId: JobInfoTable.userId,
@@ -15,7 +21,7 @@ export async function insertJobInfo(jobInfo: typeof JobInfoTable.$inferInsert) {
   return newJobInfo;
 }
 
-export async function updateJobInfo(
+export async function updateJobInfoDb(
   id: string,
   jobInfo: Partial<typeof JobInfoTable.$inferInsert>
 ) {
@@ -33,7 +39,7 @@ export async function updateJobInfo(
   return updatedJobInfo;
 }
 
-export async function getJobInfo(id: string, userId: string) {
+export async function getJobInfoDb(id: string, userId: string) {
   "use cache";
   cacheTag(getJobInfoIdTag(id));
 
@@ -42,7 +48,7 @@ export async function getJobInfo(id: string, userId: string) {
   });
 }
 
-export async function getJobInfoById(id: string) {
+export async function getJobInfoByIdDb(id: string) {
   "use cache";
   cacheTag(getJobInfoIdTag(id));
 
@@ -51,7 +57,7 @@ export async function getJobInfoById(id: string) {
   });
 }
 
-export async function getJobInfos(userId: string) {
+export async function getJobInfosDb(userId: string) {
   "use cache";
   cacheTag(getJobInfoIdTag(userId));
 
