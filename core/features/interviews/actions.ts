@@ -79,6 +79,13 @@ export async function updateInterview(
     };
   }
 
+  if (foundInterview.jobInfo.userId !== userId) {
+    return {
+      error: true,
+      message: "You don't have permission to do this.",
+    };
+  }
+
   await updateInterviewDb(id, interview);
 
   return { error: false };
