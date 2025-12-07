@@ -16,7 +16,7 @@ export default async function JobInfoEditPage({
   const { jobInfoId } = await params;
 
   return (
-    <div className="container my-4 space-y-4">
+    <div className="container max-w-5xl my-4 space-y-4">
       <JobInfoBackLink jobInfoId={jobInfoId} />
       <h1 className="text-3xl md:text-4xl">Edit Job Description</h1>
       <Card>
