@@ -32,7 +32,7 @@ export default async function InterviewsPage({
   const { jobInfoId } = await params;
 
   return (
-    <div className="container py-4 h-screen-header flex flex-col gap-4 items-start">
+    <div className="container max-w-5xl my-4 space-y-4">
       <JobInfoBackLink jobInfoId={jobInfoId} />
 
       <Suspense
