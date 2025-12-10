@@ -36,8 +36,8 @@ export default async function InterviewPage({
       if (userId == null) return redirectToSignIn();
 
       const interview = await getInterviewById(interviewId, userId);
-
       if (interview == null) return notFound();
+
       return interview;
     }
   );
