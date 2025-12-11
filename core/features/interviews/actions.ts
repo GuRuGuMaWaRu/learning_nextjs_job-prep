@@ -1,6 +1,6 @@
 "use server";
 
-import { cacheTag } from "next/cache";
+import { cacheTag, refresh } from "next/cache";
 import arcjet, { request, tokenBucket } from "@arcjet/next";
 
 import {
@@ -191,6 +191,7 @@ export async function generateInterviewFeedback(interviewId: string) {
   }
 
   await updateInterviewDb(interviewId, { feedback });
+  refresh();
 
   return { error: false };
 }
