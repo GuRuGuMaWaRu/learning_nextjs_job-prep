@@ -17,9 +17,9 @@ export default async function QuestionsPage({
   const { jobInfoId } = await params;
 
   return (
-    <div className="container max-w-5xl my-4 space-y-4">
+    <div className="container max-w-5xl py-4 space-y-4 h-screen-header flex flex-col items-start">
       <JobInfoBackLink jobInfoId={jobInfoId} />
-      <Suspense fallback={<FullScreenLoader />}>
+      <Suspense fallback={<FullScreenLoader className="m-auto" />}>
         <SuspendedComponent jobInfoId={jobInfoId} />
       </Suspense>
     </div>
