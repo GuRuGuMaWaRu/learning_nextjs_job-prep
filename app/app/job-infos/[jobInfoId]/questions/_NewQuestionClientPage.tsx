@@ -65,7 +65,7 @@ export function NewQuestionClientPage({
   });
 
   return (
-    <div className="flex flex-col gap-4 items-center grow h-screen-header w-full mx-auto max-w-[2000px]">
+    <div className="flex flex-col gap-4 items-center h-full w-full mx-auto max-w-[2000px]">
       <Controls
         answerBtnDisabled={
           answer == null || answer.trim() === "" || questionId == null
