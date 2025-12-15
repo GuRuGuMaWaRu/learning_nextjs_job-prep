@@ -340,7 +340,6 @@ function PricingSection() {
         "5 practice questions per month",
         "Email support",
       ],
-      cta: "Get Started",
       popular: false,
     },
     {
@@ -356,7 +355,6 @@ function PricingSection() {
         "Interview performance analytics",
         "Custom job description analysis",
       ],
-      cta: "Start Free Trial",
       popular: true,
     },
     {
@@ -372,14 +370,13 @@ function PricingSection() {
         "White-label options",
         "API access",
       ],
-      cta: "Contact Sales",
       popular: false,
     },
   ];
 
   return (
-    <section className="container mx-auto px-6 py-16 md:py-24 bg-muted/30">
-      <div className="text-center mb-12">
+    <section className="container mx-auto px-6 py-12 md:py-16 bg-muted/30">
+      <div className="text-center mb-8">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 text-balance">
           Choose Your <span className="text-primary">Success Plan</span>
         </h2>
@@ -390,51 +387,46 @@ function PricingSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
         {plans.map((plan) => (
           <Card
             key={plan.name}
             className={`relative transition-all hover:shadow-lg ${
               plan.popular
-                ? "border-primary shadow-lg scale-105 md:scale-110"
+                ? "border-primary shadow-lg scale-105 md:scale-105"
                 : "hover:scale-[1.02]"
             }`}>
             {plan.popular && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <Badge className="px-3 py-1 text-xs font-semibold">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="px-2 py-0.5 text-xs font-semibold">
                   Most Popular
                 </Badge>
               </div>
             )}
-            <CardHeader className="space-y-6 pb-8">
-              <div className="space-y-2">
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
+            <CardHeader className="space-y-4 p-5">
+              <div className="space-y-1">
+                <CardTitle className="text-xl">{plan.name}</CardTitle>
+                <CardDescription className="text-sm">
+                  {plan.description}
+                </CardDescription>
               </div>
 
-              <div className="space-y-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold tracking-tight">
+              <div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-3xl font-bold tracking-tight">
                     {plan.price}
                   </span>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {plan.period}
                   </span>
                 </div>
               </div>
 
-              <Button
-                className="w-full"
-                variant={plan.popular ? "default" : "outline"}
-                size="lg">
-                {plan.cta}
-              </Button>
-
-              <div className="space-y-3 pt-4">
+              <div className="space-y-2 pt-2">
                 {plan.features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm text-foreground">{feature}</span>
+                  <div key={feature} className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="text-xs text-foreground">{feature}</span>
                   </div>
                 ))}
               </div>
