@@ -4,6 +4,7 @@ Simple shadcn-based UI, multiple pages, live interviews with AI and feedbacks
 
 TODOs:
 
+[-] Hide some sections on Landing Page for small screens
 [-] Also about 404 page: when user tries to access a page that doesn't exist, we should show a 404 page with a link to the home page
 [-] Implement 404 page for dynamic routes (right now sending random ID for job-info crashes the app)
 [-] Implement 404 page (when user tries to access a page that doesn't exist)
