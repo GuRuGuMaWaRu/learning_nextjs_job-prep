@@ -110,13 +110,13 @@ export function StartCall({
     disconnect();
 
     if (interviewId == null) {
-      return router.push(`/app/job-infos/${jobInfo.id}/interviews`);
+      return router.push(`/app/jobInfo/${jobInfo.id}/interviews`);
     }
 
     if (durationRef.current != null) {
       updateInterview(interviewId, { duration: durationRef.current });
     }
-    router.push(`/app/job-infos/${jobInfo.id}/interviews/${interviewId}`);
+    router.push(`/app/jobInfo/${jobInfo.id}/interviews/${interviewId}`);
   };
 
   return (

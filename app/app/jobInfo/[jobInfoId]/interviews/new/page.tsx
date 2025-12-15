@@ -22,7 +22,7 @@ export default async function NewInterviewPage({
   return (
     <div className="container max-w-5xl py-4 space-y-4 h-screen-header flex flex-col items-start">
       <BackLink
-        href={`/app/job-infos/${jobInfoId}/interviews`}
+        href={`/app/jobInfo/${jobInfoId}/interviews`}
         className="self-start">
         Back to Interviews
       </BackLink>
@@ -42,7 +42,7 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
 
   const hasPermissionForInterviews = await canCreateInterview();
   if (!hasPermissionForInterviews) {
-    redirect(`/app/job-infos/${jobInfoId}/interviews`);
+    redirect(`/app/jobInfo/${jobInfoId}/interviews`);
   }
 
   const jobInfo = await getJobInfo(jobInfoId, userId);
