@@ -5,7 +5,15 @@ import {
   SignInButton as ClerkSignInButton,
   SignUpButton as ClerkSignUpButton,
 } from "@clerk/nextjs";
-import { Mic, FileText, Brain, TrendingUp, Clock, Target } from "lucide-react";
+import {
+  Mic,
+  FileText,
+  Brain,
+  TrendingUp,
+  Clock,
+  Target,
+  Quote,
+} from "lucide-react";
 
 import { Button } from "@/core/components/ui/button";
 import {
@@ -14,6 +22,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/core/components/ui/card";
+import { Avatar, AvatarFallback } from "@/core/components/ui/avatar";
+import { Badge } from "@/core/components/ui/badge";
 import { getCurrentUser } from "@/core/services/clerk/lib/getCurrentUser";
 import { ThemeToggle } from "@/core/components/ThemeToggle";
 
@@ -24,6 +34,7 @@ export default function LandingPage() {
       <HeroSection />
       <FeaturesSection />
       <StatsComparisonSection />
+      <TestimonialsSection />
       <Footer />
     </div>
   );
@@ -215,6 +226,96 @@ function StatsComparisonSection() {
             Start Your Success Story
           </Button>
         </ClerkSignUpButton>
+      </div>
+    </section>
+  );
+}
+
+function TestimonialsSection() {
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      role: "Software Engineer",
+      company: "Tech Innovations Inc",
+      initials: "SC",
+      result: "Hired in 3 weeks",
+      quote:
+        "Landr transformed my interview prep. The AI mock interviews helped me identify weak spots I never knew I had. I landed my dream job after just 3 interviews!",
+    },
+    {
+      name: "Marcus Johnson",
+      role: "Product Manager",
+      company: "Digital Solutions Co",
+      initials: "MJ",
+      result: "Hired in 5 weeks",
+      quote:
+        "The resume optimization feature is incredible. It helped me tailor my resume for each application, and my callback rate increased by 300%. Worth every penny!",
+    },
+    {
+      name: "Emily Rodriguez",
+      role: "Data Scientist",
+      company: "Analytics Pro",
+      initials: "ER",
+      result: "Hired in 4 weeks",
+      quote:
+        "I was struggling with technical interviews until I found Landr. The practice questions were spot-on, and the instant feedback helped me improve rapidly. Got an offer in 4 weeks!",
+    },
+    {
+      name: "David Kim",
+      role: "UX Designer",
+      company: "Creative Studio",
+      initials: "DK",
+      result: "Hired in 2 weeks",
+      quote:
+        "The personalized interview feedback was a game-changer. I went from nervous and unprepared to confident and articulate. Highly recommend to anyone job hunting!",
+    },
+  ];
+
+  return (
+    <section className="container mx-auto px-6 py-16 md:py-24">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+          Hear From Our <span className="text-primary">Success Stories</span>
+        </h2>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Real people, real results. See how Landr helped professionals land
+          their dream jobs.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+        {testimonials.map((testimonial) => (
+          <Card
+            className="transition-all hover:shadow-lg hover:scale-[1.01]"
+            key={testimonial.name}>
+            <CardHeader className="space-y-4 h-full">
+              <div className="flex items-start justify-between gap-2">
+                <Quote className="w-8 h-8 text-primary/40 shrink-0" />
+                <Badge variant="secondary" className="text-xs font-semibold">
+                  ✨ {testimonial.result}
+                </Badge>
+              </div>
+              <CardDescription className="text-base leading-relaxed">
+                &quot;{testimonial.quote}&quot;
+              </CardDescription>
+              <div className="flex items-center gap-3 pt-2 mt-auto">
+                <Avatar className="size-12">
+                  <AvatarFallback className="text-sm font-semibold">
+                    {testimonial.initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-foreground">
+                    {testimonial.name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {testimonial.role} at {testimonial.company}
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        ))}
       </div>
     </section>
   );
