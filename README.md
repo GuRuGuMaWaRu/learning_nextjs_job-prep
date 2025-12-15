@@ -4,6 +4,7 @@ Simple shadcn-based UI, multiple pages, live interviews with AI and feedbacks
 
 TODOs:
 
+[-] Also about 404 page: when user tries to access a page that doesn't exist, we should show a 404 page with a link to the home page
 [-] Implement 404 page for dynamic routes (right now sending random ID for job-info crashes the app)
 [-] Implement 404 page (when user tries to access a page that doesn't exist)
 [-] Right now when we press Easy, Medium or Hard button all of them show a spinner, which is not good UX. We should show a spinner only for the clicked button and just disable the other buttons.
