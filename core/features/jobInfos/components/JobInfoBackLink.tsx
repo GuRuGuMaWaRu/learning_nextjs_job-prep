@@ -5,7 +5,7 @@ import { getJobInfoById } from "@/core/features/jobInfos/actions";
 
 export function JobInfoBackLink({ jobInfoId }: { jobInfoId: string }) {
   return (
-    <BackLink href={`/app/job-infos/${jobInfoId}`}>
+    <BackLink href={`/app/jobInfo/${jobInfoId}`}>
       <Suspense fallback="Back to Job Info Details">
         <JobInfoName jobInfoId={jobInfoId} />
       </Suspense>

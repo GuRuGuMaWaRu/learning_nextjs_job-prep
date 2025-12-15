@@ -106,7 +106,7 @@ export default async function JobInfoPage({
           {options.map((option) => (
             <Link
               className="hover:scale-[1.02] transition-[transform_opacity]"
-              href={`/app/job-infos/${jobInfoId}/${option.href}`}
+              href={`/app/jobInfo/${jobInfoId}/${option.href}`}
               key={option.href}>
               <Card className="h-full flex flex-row items-start justify-between">
                 <CardHeader className="grow">
