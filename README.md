@@ -4,11 +4,12 @@ Simple shadcn-based UI, multiple pages, live interviews, technical questions pra
 
 TODOs:
 
-[-] Implement 404 page for dynamic routes (right now sending random ID for job-info crashes the app)
-[-] Looks into 404 pages for deeper nested routes
+---
 
 Completed TODOs:
 
+[V] Looks into 404 pages for deeper nested routes
+[V] Implement 404 page for dynamic routes (right now sending random ID for job-info crashes the app)
 [V] Fix main app page loader vertical centering
 [V] Possibly need a file with all routes that we use
 [V] Add 404 page for the main app layer - it will activate when a logged in user tries to access a top-layer page that doesn't exist, i.e. /sdfsadfsdaf
