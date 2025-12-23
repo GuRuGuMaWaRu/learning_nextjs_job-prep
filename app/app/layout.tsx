@@ -18,8 +18,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 async function AuthCheckAndNavbar({ children }: { children: React.ReactNode }) {
   const { userId, user } = await getCurrentUser({ allData: true });
 
-  if (userId == null) return redirect(routes.landing);
-  if (user == null) return redirect(routes.onboarding);
+  if (userId == null || user == null) return redirect(routes.landing);
 
   return (
     <>
