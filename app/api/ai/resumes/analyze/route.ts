@@ -7,7 +7,7 @@ import {
   FILE_TYPE_NOT_SUPPORTED_MESSAGE,
   PLAN_LIMIT_MESSAGE,
 } from "@/core/lib/errorToast";
-import { dalAssertSuccess } from "@/core/dal/helpers";
+import { NotFoundError, PermissionError } from "@/core/dal/helpers";
 
 export async function POST(req: Request) {
   const { userId } = await getCurrentUser();
@@ -39,24 +39,38 @@ export async function POST(req: Request) {
     return new Response(FILE_TYPE_NOT_SUPPORTED_MESSAGE, { status: 400 });
   }
 
-  const jobInfo = dalAssertSuccess(await getJobInfo(jobInfoId, userId));
+  try {
+    // getJobInfo now handles auth internally and throws on error
+    const jobInfo = await getJobInfo(jobInfoId);
 
-  if (jobInfo == null) {
-    return new Response("You do not have permission to do this", {
-      status: 403,
+    if (jobInfo == null) {
+      return new Response("You do not have permission to do this", {
+        status: 403,
+      });
+    }
+
+    if (!(await checkResumeAnalysisPermission())) {
+      return new Response(PLAN_LIMIT_MESSAGE, {
+        status: 403,
+      });
+    }
+
+    const res = await analyzeResumeForJob({
+      resumeFile,
+      jobInfo,
+    });
+
+    return res.toTextStreamResponse();
+  } catch (error) {
+    if (error instanceof NotFoundError || error instanceof PermissionError) {
+      return new Response("You do not have permission to do this", {
+        status: 403,
+      });
+    }
+
+    console.error("Error analyzing resume:", error);
+    return new Response("An error occurred while analyzing your resume", {
+      status: 500,
     });
   }
-
-  if (!(await checkResumeAnalysisPermission())) {
-    return new Response(PLAN_LIMIT_MESSAGE, {
-      status: 403,
-    });
-  }
-
-  const res = await analyzeResumeForJob({
-    resumeFile,
-    jobInfo,
-  });
-
-  return res.toTextStreamResponse();
 }

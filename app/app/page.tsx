@@ -17,7 +17,6 @@ import { formatExperienceLevel } from "@/core/features/jobInfos/lib/formatters";
 import { getJobInfos } from "@/core/features/jobInfos/actions";
 import { getCurrentUser } from "@/core/features/auth/server";
 import { routes } from "@/core/data/routes";
-import { dalAssertSuccess } from "@/core/dal/helpers";
 
 export default function AppPage() {
   return (
@@ -32,7 +31,8 @@ async function JobInfos() {
   const { userId, redirectToSignIn } = await getCurrentUser();
   if (userId == null) return redirectToSignIn();
 
-  const jobInfos = dalAssertSuccess(await getJobInfos(userId));
+  // getJobInfos now handles auth internally and throws on error
+  const jobInfos = await getJobInfos();
 
   if (jobInfos.length === 0) {
     return <NoJobInfos />;

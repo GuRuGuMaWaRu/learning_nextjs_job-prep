@@ -20,7 +20,7 @@ import { getCurrentUser } from "@/core/features/auth/server";
 import { PLAN_LIMIT_MESSAGE, RATE_LIMIT_MESSAGE } from "@/core/lib/errorToast";
 import { env } from "@/core/data/env/server";
 import { generateAiInterviewFeedback } from "@/core/services/ai/interviews";
-import { dalAssertSuccess, dalDbOperation } from "@/core/dal/helpers";
+import { DatabaseError } from "@/core/dal/helpers";
 
 const aj = arcjet({
   characteristics: ["userId"],
@@ -78,28 +78,32 @@ export async function createInterview({
     };
   }
 
-  const jobInfo = dalAssertSuccess(await getJobInfo(jobInfoId, userId));
-  if (jobInfo == null) {
+  try {
+    // getJobInfo now handles auth internally and throws on error
+    const jobInfo = await getJobInfo(jobInfoId);
+    if (jobInfo == null) {
+      return {
+        error: true,
+        message: "You don't have permission to do this.",
+      };
+    }
+
+    const interview = await insertInterviewDb({
+      jobInfoId,
+      duration: "00:00:00",
+    });
+
+    return {
+      error: false,
+      id: interview.id,
+    };
+  } catch (error) {
+    console.error("Error creating interview:", error);
     return {
       error: true,
-      message: "You don't have permission to do this.",
+      message: "Failed to create interview. Please try again.",
     };
   }
-
-  const interview = dalAssertSuccess(
-    await dalDbOperation(
-      async () =>
-        await insertInterviewDb({
-          jobInfoId,
-          duration: "00:00:00",
-        })
-    )
-  );
-
-  return {
-    error: false,
-    id: interview.id,
-  };
 }
 
 export async function updateInterview(
@@ -114,34 +118,41 @@ export async function updateInterview(
     };
   }
 
-  const foundInterview = dalAssertSuccess(
-    await dalDbOperation(async () => await getInterviewByIdDb(id))
-  );
-  if (foundInterview == null)
-    return { error: true, message: "You don't have permission to do this." };
-  if (foundInterview.jobInfo.userId !== userId)
-    return { error: true, message: "You don't have permission to do this." };
+  try {
+    const foundInterview = await getInterviewByIdDb(id);
+    if (foundInterview == null)
+      return { error: true, message: "You don't have permission to do this." };
+    if (foundInterview.jobInfo.userId !== userId)
+      return { error: true, message: "You don't have permission to do this." };
 
-  dalAssertSuccess(
-    await dalDbOperation(async () => await updateInterviewDb(id, interview))
-  );
+    await updateInterviewDb(id, interview);
 
-  return { error: false };
+    return { error: false };
+  } catch (error) {
+    console.error("Error updating interview:", error);
+    return {
+      error: true,
+      message: "Failed to update interview. Please try again.",
+    };
+  }
 }
 
 export async function getInterviewById(id: string, userId: string) {
   "use cache";
   cacheTag(getInterviewIdTag(id));
 
-  const foundInterview = dalAssertSuccess(
-    await dalDbOperation(async () => await getInterviewByIdDb(id))
-  );
-  if (foundInterview == null) return null;
+  try {
+    const foundInterview = await getInterviewByIdDb(id);
+    if (foundInterview == null) return null;
 
-  cacheTag(getJobInfoIdTag(foundInterview.jobInfo.id));
+    cacheTag(getJobInfoIdTag(foundInterview.jobInfo.id));
 
-  if (foundInterview.jobInfo.userId !== userId) return null;
-  return foundInterview;
+    if (foundInterview.jobInfo.userId !== userId) return null;
+    return foundInterview;
+  } catch (error) {
+    console.error("Database error getting interview:", error);
+    throw new DatabaseError("Failed to fetch interview from database", error);
+  }
 }
 
 export async function canCreateInterview(): Promise<boolean> {
@@ -153,7 +164,12 @@ export async function getInterviews(jobInfoId: string, userId: string) {
   cacheTag(getInterviewJobInfoTag(jobInfoId));
   cacheTag(getJobInfoIdTag(jobInfoId));
 
-  return dalDbOperation(async () => await getInterviewsDb(jobInfoId, userId));
+  try {
+    return await getInterviewsDb(jobInfoId, userId);
+  } catch (error) {
+    console.error("Database error getting interviews:", error);
+    throw new DatabaseError("Failed to fetch interviews from database", error);
+  }
 }
 
 export async function generateInterviewFeedback(interviewId: string) {
@@ -183,30 +199,29 @@ export async function generateInterviewFeedback(interviewId: string) {
     };
   }
 
-  const feedback = dalAssertSuccess(
-    await dalDbOperation(
-      async () =>
-        await generateAiInterviewFeedback({
-          humeChatId: interview.humeChatId as string,
-          jobInfo: interview.jobInfo,
-          userName: user.name,
-        })
-    )
-  );
+  try {
+    const feedback = await generateAiInterviewFeedback({
+      humeChatId: interview.humeChatId as string,
+      jobInfo: interview.jobInfo,
+      userName: user.name,
+    });
 
-  if (feedback == null) {
+    if (feedback == null) {
+      return {
+        error: true,
+        message: "Failed to generate feedback",
+      };
+    }
+
+    await updateInterviewDb(interviewId, { feedback });
+    refresh();
+
+    return { error: false };
+  } catch (error) {
+    console.error("Error generating interview feedback:", error);
     return {
       error: true,
-      message: "Failed to generate feedback",
+      message: "Failed to generate feedback. Please try again.",
     };
   }
-
-  dalAssertSuccess(
-    await dalDbOperation(
-      async () => await updateInterviewDb(interviewId, { feedback })
-    )
-  );
-  refresh();
-
-  return { error: false };
 }

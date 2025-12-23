@@ -3,7 +3,7 @@ import {
   SESSION_DURATION_MS,
   SESSION_REFRESH_THRESHOLD_MS,
 } from "@/core/features/auth/constants";
-import { dalAssertSuccess, dalDbOperation } from "@/core/dal/helpers";
+import { DatabaseError } from "@/core/dal/helpers";
 import {
   createSessionDb,
   deleteAllUserSessionsDb,
@@ -31,13 +31,13 @@ export async function createSession(userId: string): Promise<Session> {
   const token = generateSecureToken();
   const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
 
-  const [session] = dalAssertSuccess(
-    await dalDbOperation(
-      async () => await createSessionDb({ userId, token, expiresAt })
-    )
-  );
-
-  return session;
+  try {
+    const [session] = await createSessionDb({ userId, token, expiresAt });
+    return session;
+  } catch (error) {
+    console.error("Database error creating session:", error);
+    throw new DatabaseError("Failed to create session", error);
+  }
 }
 
 /**
@@ -46,15 +46,18 @@ export async function createSession(userId: string): Promise<Session> {
  * @returns Session object if valid, null otherwise
  */
 export async function validateSession(token: string): Promise<Session | null> {
-  const [session] = dalAssertSuccess(
-    await dalDbOperation(async () => await validateSessionDb(token))
-  );
+  try {
+    const [session] = await validateSessionDb(token);
 
-  if (!session) {
-    return null;
+    if (!session) {
+      return null;
+    }
+
+    return session;
+  } catch (error) {
+    console.error("Database error validating session:", error);
+    throw new DatabaseError("Failed to validate session", error);
   }
-
-  return session;
 }
 
 /**
@@ -75,15 +78,14 @@ export async function extendSessionIfNeeded(
   const timeUntilExpiry = session.expiresAt.getTime() - Date.now();
 
   if (timeUntilExpiry < SESSION_REFRESH_THRESHOLD_MS) {
-    const newExpiresAt = new Date(Date.now() + SESSION_DURATION_MS);
-
-    const [updatedSession] = dalAssertSuccess(
-      await dalDbOperation(
-        async () => await extendSessionDb(session.id, newExpiresAt)
-      )
-    );
-
-    return updatedSession;
+    try {
+      const newExpiresAt = new Date(Date.now() + SESSION_DURATION_MS);
+      const [updatedSession] = await extendSessionDb(session.id, newExpiresAt);
+      return updatedSession;
+    } catch (error) {
+      console.error("Database error extending session:", error);
+      throw new DatabaseError("Failed to extend session", error);
+    }
   }
 
   return session;
@@ -94,9 +96,12 @@ export async function extendSessionIfNeeded(
  * @param token - Session token to delete
  */
 export async function deleteSession(token: string): Promise<void> {
-  dalAssertSuccess(
-    await dalDbOperation(async () => await deleteSessionDb(token))
-  );
+  try {
+    await deleteSessionDb(token);
+  } catch (error) {
+    console.error("Database error deleting session:", error);
+    throw new DatabaseError("Failed to delete session", error);
+  }
 }
 
 /**
@@ -104,9 +109,12 @@ export async function deleteSession(token: string): Promise<void> {
  * @param userId - User ID to delete sessions for
  */
 export async function deleteAllUserSessions(userId: string): Promise<void> {
-  dalAssertSuccess(
-    await dalDbOperation(async () => await deleteAllUserSessionsDb(userId))
-  );
+  try {
+    await deleteAllUserSessionsDb(userId);
+  } catch (error) {
+    console.error("Database error deleting user sessions:", error);
+    throw new DatabaseError("Failed to delete user sessions", error);
+  }
 }
 
 /**
@@ -114,9 +122,12 @@ export async function deleteAllUserSessions(userId: string): Promise<void> {
  * Should be run periodically
  */
 export async function deleteExpiredSessions(): Promise<void> {
-  dalAssertSuccess(
-    await dalDbOperation(async () => await deleteExpiredSessionsDb())
-  );
+  try {
+    await deleteExpiredSessionsDb();
+  } catch (error) {
+    console.error("Database error deleting expired sessions:", error);
+    throw new DatabaseError("Failed to delete expired sessions", error);
+  }
 }
 
 /**
@@ -125,7 +136,10 @@ export async function deleteExpiredSessions(): Promise<void> {
  * @returns Array of active sessions
  */
 export async function getUserSessions(userId: string): Promise<Session[]> {
-  return dalAssertSuccess(
-    await dalDbOperation(async () => await getUserSessionsDb(userId))
-  );
+  try {
+    return await getUserSessionsDb(userId);
+  } catch (error) {
+    console.error("Database error getting user sessions:", error);
+    throw new DatabaseError("Failed to get user sessions", error);
+  }
 }

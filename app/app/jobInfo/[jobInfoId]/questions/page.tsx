@@ -7,7 +7,6 @@ import { checkQuestionsPermission } from "@/core/features/questions/permissions"
 import { JobInfoBackLink } from "@/core/features/jobInfos/components/JobInfoBackLink";
 import { getCurrentUser } from "@/core/features/auth/server";
 import { routes } from "@/core/data/routes";
-import { dalAssertSuccess } from "@/core/dal/helpers";
 
 import { NewQuestionClientPage } from "./_NewQuestionClientPage";
 
@@ -34,7 +33,8 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
 
   if (!(await checkQuestionsPermission())) redirect(routes.upgrade);
 
-  const jobInfo = dalAssertSuccess(await getJobInfo(jobInfoId, userId));
+  // getJobInfo now handles auth internally and throws on error
+  const jobInfo = await getJobInfo(jobInfoId);
   if (jobInfo == null) return notFound();
 
   return <NewQuestionClientPage jobInfo={jobInfo} />;

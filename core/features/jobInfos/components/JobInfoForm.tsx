@@ -4,6 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 import {
   Form,
@@ -29,7 +30,8 @@ import { experienceLevels, JobInfoTable } from "@/core/drizzle/schema";
 
 import { jobInfoSchema } from "../schemas";
 import { formatExperienceLevel } from "../lib/formatters";
-import { createJobInfo, updateJobInfo } from "../actions";
+import { createJobInfoAction, updateJobInfoAction } from "../actions";
+import { routes } from "@/core/data/routes";
 
 type JobInfoFormData = z.infer<typeof jobInfoSchema>;
 
@@ -41,6 +43,7 @@ export function JobInfoForm({
     "id" | "name" | "title" | "description" | "experienceLevel"
   >;
 }) {
+  const router = useRouter();
   const form = useForm<JobInfoFormData>({
     resolver: zodResolver(jobInfoSchema),
     defaultValues: jobInfo ?? {
@@ -53,13 +56,19 @@ export function JobInfoForm({
 
   async function onSubmit(values: JobInfoFormData) {
     const action = jobInfo
-      ? updateJobInfo.bind(null, jobInfo.id)
-      : createJobInfo;
+      ? updateJobInfoAction.bind(null, jobInfo.id)
+      : createJobInfoAction;
 
     const res = await action(values);
 
-    if (res.error) {
+    if (!res.success) {
       toast.error(res.message);
+    } else {
+      // Success! Redirect to the job info page
+      toast.success(
+        jobInfo ? "Job information updated!" : "Job information created!"
+      );
+      router.push(routes.jobInfo(res.data.id));
     }
   }
 

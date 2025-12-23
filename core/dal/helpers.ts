@@ -1,60 +1,94 @@
-import { DrizzleQueryError } from "drizzle-orm";
+import { getCurrentUser } from "../features/auth/server";
 
-export async function dalDbOperation<T>(operation: () => Promise<T>) {
-  try {
-    const result = await operation();
-    return createSuccessReturn(result);
-  } catch (error) {
-    console.error(error);
-    return createErrorReturn({ type: "unknown-error", error });
+/**
+ * Custom error classes for better error handling throughout the application
+ */
+
+export class UnauthorizedError extends Error {
+  constructor(message = "You must be logged in to perform this action") {
+    super(message);
+    this.name = "UnauthorizedError";
   }
 }
 
-export function dalAssertSuccess<T>(dalReturn: DalReturn<T>): T {
-  if (dalReturn.success) {
-    return dalReturn.data;
+export class NotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "NotFoundError";
   }
-  throw dalReturn.error;
 }
 
-export function createSuccessReturn<T>(data: T): DalReturn<T> {
-  return {
-    success: true,
-    data,
-  };
+export class PermissionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PermissionError";
+  }
 }
 
-export function createErrorReturn<E extends DalError>(
-  error: E
-): DalReturn<never> {
-  return {
-    success: false,
-    error,
-  };
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
 }
 
-export type DalReturn<T, E extends DalError = DalError> =
+export class DatabaseError extends Error {
+  constructor(message: string, public readonly originalError?: unknown) {
+    super(message);
+    this.name = "DatabaseError";
+  }
+}
+
+/**
+ * DAL Helper Functions
+ */
+
+/**
+ * Require authenticated user, throw if not logged in
+ * Use this in Service layer when auth is required
+ */
+export async function requireUser(): Promise<string> {
+  const { userId } = await getCurrentUser();
+
+  if (!userId) {
+    throw new UnauthorizedError();
+  }
+
+  return userId;
+}
+
+/**
+ * Get current user if available, return null if not
+ * Use this when auth is optional
+ */
+export async function getOptionalUser(): Promise<string | null> {
+  const { userId } = await getCurrentUser();
+  return userId ?? null;
+}
+
+/**
+ * Require user with full data
+ * Throws UnauthorizedError if not authenticated
+ */
+export async function requireUserWithData() {
+  const { userId, user } = await getCurrentUser({ allData: true });
+
+  if (!userId || !user) {
+    throw new UnauthorizedError();
+  }
+
+  return { userId, user };
+}
+
+/**
+ * Action result type for consistent server action returns
+ */
+export type ActionResult<T = void> =
   | {
       success: true;
       data: T;
     }
   | {
       success: false;
-      error: E;
-    };
-
-export type DalError =
-  | {
-      type: "no-user-error";
-    }
-  | {
-      type: "no-access-error";
-    }
-  | {
-      type: "drizzle-error";
-      error: DrizzleQueryError;
-    }
-  | {
-      type: "unknown-error";
-      error: unknown;
+      message: string;
     };

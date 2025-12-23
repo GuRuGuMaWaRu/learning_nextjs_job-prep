@@ -11,7 +11,7 @@ import {
   getQuestions,
   insertQuestion,
 } from "@/core/features/questions/actions";
-import { dalAssertSuccess } from "@/core/dal/helpers";
+import { NotFoundError, PermissionError } from "@/core/dal/helpers";
 
 const schema = z.object({
   prompt: z.enum(questionDifficulties),
@@ -37,40 +37,54 @@ export async function POST(req: Request) {
     return new Response(PLAN_LIMIT_MESSAGE, { status: 403 });
   }
 
-  const jobInfo = dalAssertSuccess(await getJobInfo(jobInfoId, userId));
-  if (jobInfo == null) {
-    return new Response("You do not have permission to do this", {
-      status: 403,
+  try {
+    // getJobInfo now handles auth internally and throws on error
+    const jobInfo = await getJobInfo(jobInfoId);
+    if (jobInfo == null) {
+      return new Response("You do not have permission to do this", {
+        status: 403,
+      });
+    }
+
+    const previousQuestions = await getQuestions(jobInfoId);
+
+    return createUIMessageStreamResponse({
+      status: 200,
+      statusText: "OK",
+      stream: createUIMessageStream({
+        execute({ writer }) {
+          const res = generateAiQuestion({
+            previousQuestions,
+            jobInfo,
+            difficulty,
+            onFinish: async (question) => {
+              const { id } = await insertQuestion(
+                question,
+                jobInfoId,
+                difficulty
+              );
+              writer.write({
+                type: "text-delta",
+                delta: `Question ID: ${id}`,
+                id: "generate-question",
+              });
+            },
+          });
+
+          writer.merge(res.toUIMessageStream());
+        },
+      }),
+    });
+  } catch (error) {
+    if (error instanceof NotFoundError || error instanceof PermissionError) {
+      return new Response("You do not have permission to do this", {
+        status: 403,
+      });
+    }
+
+    console.error("Error generating question:", error);
+    return new Response("An error occurred while generating your question", {
+      status: 500,
     });
   }
-
-  const previousQuestions = await getQuestions(jobInfoId);
-
-  return createUIMessageStreamResponse({
-    status: 200,
-    statusText: "OK",
-    stream: createUIMessageStream({
-      execute({ writer }) {
-        const res = generateAiQuestion({
-          previousQuestions,
-          jobInfo,
-          difficulty,
-          onFinish: async (question) => {
-            const { id } = await insertQuestion(
-              question,
-              jobInfoId,
-              difficulty
-            );
-            writer.write({
-              type: "text-delta",
-              delta: `Question ID: ${id}`,
-              id: "generate-question",
-            });
-          },
-        });
-
-        writer.merge(res.toUIMessageStream());
-      },
-    }),
-  });
 }
