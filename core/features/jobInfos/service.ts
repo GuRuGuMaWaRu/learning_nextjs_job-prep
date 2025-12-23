@@ -8,12 +8,16 @@ import {
   getJobInfosDal,
   updateJobInfoDal,
 } from "./dal";
-import { requireUser, PermissionError } from "@/core/dal/helpers";
+import {
+  requireUser,
+  PermissionError,
+  NotFoundError,
+} from "@/core/dal/helpers";
 
 /**
  * Service Layer for JobInfo
  * Handles: Business logic, permissions, validation enforcement
- * Throws: PermissionError
+ * Throws: UnauthorizedError (from requireUser), PermissionError, NotFoundError
  */
 
 /**
@@ -52,7 +56,13 @@ export async function updateJobInfoService(
   // Verify ownership by fetching with ownership check
   const existingJobInfo = await getJobInfoDal(id, userId);
 
-  // Double-check ownership (getJobInfoDal already checks, but being explicit)
+  if (!existingJobInfo) {
+    throw new NotFoundError(
+      "Job posting not found or you don't have permission to edit it."
+    );
+  }
+
+  // Double-check ownership (getJobInfoDal already checks by filtering, but being explicit)
   if (existingJobInfo.userId !== userId) {
     throw new PermissionError(
       "You don't have permission to edit this job posting."
@@ -68,10 +78,11 @@ export async function updateJobInfoService(
 /**
  * Get a single job info with ownership verification
  * Enforces: User must own the job info
+ * Returns null if not found or user doesn't own it
  */
 export async function getJobInfoService(id: string) {
   const userId = await requireUser();
-  // This checks both auth and ownership
+  // This checks both auth and ownership, returns null if not found
   return await getJobInfoDal(id, userId);
 }
 
@@ -100,8 +111,13 @@ export async function getJobInfosService() {
 export async function verifyJobInfoAccessService(jobInfoId: string) {
   const userId = await requireUser();
 
-  // This will throw NotFoundError if user doesn't own it
   const jobInfo = await getJobInfoDal(jobInfoId, userId);
+
+  if (!jobInfo) {
+    throw new NotFoundError(
+      "Job posting not found or you don't have permission to access it."
+    );
+  }
 
   return { jobInfo, userId };
 }
