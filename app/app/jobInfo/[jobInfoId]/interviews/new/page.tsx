@@ -9,7 +9,6 @@ import { getJobInfo } from "@/core/features/jobInfos/actions";
 import { canCreateInterview } from "@/core/features/interviews/actions";
 import { env } from "@/core/data/env/server";
 import { routes } from "@/core/data/routes";
-import { dalAssertSuccess } from "@/core/dal/helpers";
 
 import { StartCall } from "./_StartCall";
 import { InterviewVoiceBoundary } from "./_InterviewVoiceBoundary";
@@ -45,7 +44,8 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
     redirect(routes.interviews(jobInfoId));
   }
 
-  const jobInfo = dalAssertSuccess(await getJobInfo(jobInfoId, userId));
+  // getJobInfo now handles auth internally and throws on error
+  const jobInfo = await getJobInfo(jobInfoId);
   if (jobInfo == null) return notFound();
 
   const accessToken = await fetchAccessToken({
