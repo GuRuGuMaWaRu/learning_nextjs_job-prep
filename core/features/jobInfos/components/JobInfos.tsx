@@ -1,17 +1,10 @@
 import Link from "next/link";
-import { ArrowRightIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@core/components/ui/card";
+import { Card, CardContent } from "@core/components/ui/card";
 import { Button } from "@core/components/ui/button";
-import { Badge } from "@core/components/ui/badge";
 import { JobInfoForm } from "@/core/features/jobInfos/components/JobInfoForm";
-import { formatExperienceLevel } from "@/core/features/jobInfos/lib/formatters";
+import { JobInfoCard } from "@/core/features/jobInfos/components/JobInfoCard";
 import { getJobInfos } from "@/core/features/jobInfos/actions";
 import { routes } from "@/core/data/routes";
 
@@ -35,8 +28,10 @@ export async function JobInfos() {
           </Link>
         </Button>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 has-hover:*:not-hover:opacity-70">
-        <Link className="transition-opacity" href={routes.newJobInfo}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Link
+          className="transition-opacity hover:[.job-info-card]:opacity-70"
+          href={routes.newJobInfo}>
           <Card className="h-full flex items-center justify-center border-dashed border-3 bg-transparent hover:border-primary/50 transition-colors shadow-none">
             <div className="text-lg flex items-center gap-2">
               <PlusIcon className="size-6" />
@@ -45,34 +40,7 @@ export async function JobInfos() {
           </Card>
         </Link>
         {jobInfos.map((jobInfo) => (
-          <Link
-            className="hover:scale-[1.02] transition-[transform_opacity]"
-            href={routes.jobInfo(jobInfo.id)}
-            key={jobInfo.id}>
-            <Card className="h-full">
-              <div className="flex items-center justify-between h-full">
-                <div className="space-y-4 h-full">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{jobInfo.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-muted-foreground line-clamp-3">
-                    {jobInfo.description}
-                  </CardContent>
-                  <CardFooter className="flex gap-2">
-                    <Badge variant="outline">
-                      {formatExperienceLevel(jobInfo.experienceLevel)}
-                    </Badge>
-                    {jobInfo.title && (
-                      <Badge variant="outline">{jobInfo.title}</Badge>
-                    )}
-                  </CardFooter>
-                </div>
-                <CardContent>
-                  <ArrowRightIcon className="size-6" />
-                </CardContent>
-              </div>
-            </Card>
-          </Link>
+          <JobInfoCard key={jobInfo.id} jobInfo={jobInfo} />
         ))}
       </div>
     </div>

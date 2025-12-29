@@ -6,8 +6,12 @@ import {
   getJobInfoDb,
   updateJobInfoDb,
   getJobInfosDb,
-} from "./db";
-import { getJobInfoIdTag, getJobInfoGlobalTag } from "./dbCache";
+  removeJobInfoDb,
+} from "@/core/features/jobInfos/db";
+import {
+  getJobInfoIdTag,
+  getJobInfoGlobalTag,
+} from "@/core/features/jobInfos/dbCache";
 import { DatabaseError } from "@/core/dal/helpers";
 import { JobInfoTable } from "@/core/drizzle/schema";
 
@@ -102,6 +106,21 @@ export async function updateJobInfoDal(
     console.error("Database error updating job info:", error);
     throw new DatabaseError(
       "Failed to update job information in database",
+      error
+    );
+  }
+}
+
+/**
+ * Remove a job info by ID
+ */
+export async function removeJobInfoDal(id: string) {
+  try {
+    return await removeJobInfoDb(id);
+  } catch (error) {
+    console.error("Database error removing job info:", error);
+    throw new DatabaseError(
+      "Failed to remove job information from database",
       error
     );
   }

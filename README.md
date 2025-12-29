@@ -4,43 +4,51 @@ Simple shadcn-based UI, multiple pages, live interviews, technical questions pra
 
 TODOs:
 
-[-] Should be able to delete Job Infos
-[-] Use zod validation for all forms
-[-] Check for existing email in the database before signing up - while user types or as a blur event happens
-[-] Allow changing plans (do I need Stripe for this?)
-[-] show available counts for all items that have limits. These counts should be displayed on Job Info page on specific nav items that have limits (Interviews, Questions, Resume Analyses)
+- [-] Use zod validation for all forms
+- [-] Check for existing email in the database before signing up - while user types or as a blur event happens
+- [-] Allow changing plans (do I need Stripe for this?)
+- [-] Show available counts for all items that have limits. These counts should be displayed on Job Info page on specific nav items that have limits (Interviews, Questions, Resume Analyses)
+- [-] Proper DAL according to Next.js documentation, also auth via Proxy
+- [-] Go over all my auth flow and update it to session-based authentication as per Next.js documentation and [https://www.youtube.com/watch?v=yoiBv0K6_1U]
+- [-] Implement OAuth for authentication (Google, GitHub, etc.)
 
 Completed TODOs:
 
-[V] Resumes page is not loading properly, I get redirected to Upgrade Plans page, which is not implemented yet. UPDATE: turns out this was a feature, not a bug; user is redirected to Upgrade Plans page only if he has no available resume analyses left.
-[V] On Job Infos page the main button for creating a new job info should be displayed first, before the list of job infos
-[V] Loading spinner for Interviews page is not aligned to the center of the page
-[V] Add DAL layers for all actions
-[V] Try to use data access layer as per WDS? [https://github.com/WebDevSimplified/next-js-data-access-layer/tree/main/src]. May be a good idea, at least worth a try. UPDATE: tried with a somewhat different approach, relied on Cursor to help me out and create a multi-layered architecture.
-[V] Username is missing in Interview actions (generateInterviewFeedback)
-[V] Looks into 404 pages for deeper nested routes
-[V] Implement 404 page for dynamic routes (right now sending random ID for job-info crashes the app)
-[V] Fix main app page loader vertical centering
-[V] Possibly need a file with all routes that we use
-[V] Add 404 page for the main app layer - it will activate when a logged in user tries to access a top-layer page that doesn't exist, i.e. /sdfsadfsdaf
-[V] Right now when we press Easy, Medium or Hard button all of them show a spinner, which is not good UX. We should show a spinner only for the clicked button and just disable the other buttons.
-[V] Show feedback overall rating on Interviews page
-[V] Interviews page should also show if interviews already have feedback generated
-[V] After an interview feedback is generated button name still says Generate Feedback; should be View Feedback
-[V] remove intermediary New Interview page - currently it feels clunky because first you click New Interview and are redirected to a new page with a green button New Interview in the middle. Feels very jarring... The idea is that clicking New Interview on Interviews page will bring a user directly on a page where interview is conducted
-[V] show Plan Limit Reached warning on Upgrades page dynamically, that is only for users who really reached the limit
+- [V] BUG: When adding a new job info a user is redirected to that Job Info page, but if he goes back to Job Infos List page he won't see the new job info, only refreshing the page helps.
+- [V] Should be able to delete Job Infos. For this I need a delete button (and a confirmation dialog). For the delete button I need to change Job Info card styling. When I hover over Delete Button it should show a tooltip, activate hover state for the whole card and make it's border red. For the Go To Button I need to add a tooltip that says "Go to Job Info" and activate hover state for the whole card.
+- [V] Resumes page is not loading properly, I get redirected to Upgrade Plans page, which is not implemented yet. UPDATE: turns out this was a feature, not a bug; user is redirected to Upgrade Plans page only if he has no available resume analyses left.
+- [V] On Job Infos page the main button for creating a new job info should be displayed first, before the list of job infos
+- [V] Loading spinner for Interviews page is not aligned to the center of the page
+- [V] Add DAL layers for all actions
+- [V] Try to use data access layer as per WDS? [https://github.com/WebDevSimplified/next-js-data-access-layer/tree/main/src]. May be a good idea, at least worth a try. UPDATE: tried with a somewhat different approach, relied on Cursor to help me out and create a multi-layered architecture.
+- [V] Username is missing in Interview actions (generateInterviewFeedback)
+- [V] Looks into 404 pages for deeper nested routes
+- [V] Implement 404 page for dynamic routes (right now sending random ID for job-info crashes the app)
+- [V] Fix main app page loader vertical centering
+- [V] Possibly need a file with all routes that we use
+- [V] Add 404 page for the main app layer - it will activate when a logged in user tries to access a top-layer page that doesn't exist, i.e. /sdfsadfsdaf
+- [V] Right now when we press Easy, Medium or Hard button all of them show a spinner, which is not good UX. We should show a spinner only for the clicked button and just disable the other buttons.
+- [V] Show feedback overall rating on Interviews page
+- [V] Interviews page should also show if interviews already have feedback generated
+- [V] After an interview feedback is generated button name still says Generate Feedback; should be View Feedback
+- [V] remove intermediary New Interview page - currently it feels clunky because first you click New Interview and are redirected to a new page with a green button New Interview in the middle. Feels very jarring... The idea is that clicking New Interview on Interviews page will bring a user directly on a page where interview is conducted
+- [V] show Plan Limit Reached warning on Upgrades page dynamically, that is only for users who really reached the limit
 
 Optional TODOs:
 
-[-?] Create a fork of this project with Tanstack Start.
-[-?] Hide some sections on Landing Page for small screens
-[-?] Try out BetterAuth for authentication [https://www.better-auth.com/]
-[-?] Try to use data access layer as per WDS? [https://github.com/WebDevSimplified/next-js-data-access-layer/tree/main/src]. I did some version of this, but it feels bad. Maybe some day I will try it again.
-[-?] May be an interesting idea to have an item called Check Your Fitness For The Job. For this a user will be able to save his professional description (not a CV, but the whole dump of his professional experience, skills, etc.) and then the app will analyze it and give him a score and a list of things he can improve to increase his chances of getting the job.
+- [-?] Create a fork of this project with Tanstack Start.
+- [-?] Hide some sections on Landing Page for small screens
+- [-?] Try out BetterAuth for authentication [https://www.better-auth.com/]
+- [-?] Try to use data access layer as per WDS? [https://github.com/WebDevSimplified/next-js-data-access-layer/tree/main/src]. I did some version of this, but it feels bad. Maybe some day I will try it again.
+- [-?] May be an interesting idea to have an item called Check Your Fitness For The Job. For this a user will be able to save his professional description (not a CV, but the whole dump of his professional experience, skills, etc.) and then the app will analyze it and give him a score and a list of things he can improve to increase his chances of getting the job.
+- [-?] Tweak colors to make the app more visually appealing, maybe also change some rounding etc. Personally I don't like the current Dark theme, want something more bluish.
+- [-?] Since we already store all generated questions, we can use them for later reference - user may want to see the correct answer. Yet there's a problem - currently we save only questions, not the answer given by the user and AI feedback. We should store them. UPDATE: all replies/feedback will be saved automatically, then we can show them for a particular JobInfo, but there's also going to ba a page where user can see all questions/replies/feedbacks with ability to filter out by JobInfo, Question, Difficulty, etc and be able to delete them.
+- [-?] There's currently no way to set user profile image. We should allow users to upload a profile image.
+- [-?] I throw a lot of errors in my layered architecture, which seems confusing to me. I'd like to either return a success or failure object, not throw errors. Then in the layer closest to the UI I can handle the errors by either displaying them to the user or redirecting to an error page.
 
 ---
 
-## IDEAS FOR IMPROVEMENTS
+## IDEAS FOR IMPROVEMENTS (generated by Cursor)
 
 ### 1. User Experience Enhancements
 

@@ -7,7 +7,8 @@ import {
   getJobInfoByIdDal,
   getJobInfosDal,
   updateJobInfoDal,
-} from "./dal";
+  removeJobInfoDal,
+} from "@/core/features/jobInfos/dal";
 import {
   requireUser,
   PermissionError,
@@ -117,4 +118,22 @@ export async function verifyJobInfoAccessService(jobInfoId: string) {
   }
 
   return { jobInfo, userId };
+}
+
+/**
+ * Remove a job info by ID
+ * Used in pages to remove a job info + all related interviews and questions
+ */
+export async function removeJobInfoService(id: string) {
+  const userId = await requireUser();
+
+  const jobInfo = await getJobInfoDal(id, userId);
+
+  if (!jobInfo) {
+    throw new NotFoundError(
+      "Job posting not found or you don't have permission to delete it."
+    );
+  }
+
+  return await removeJobInfoDal(id);
 }

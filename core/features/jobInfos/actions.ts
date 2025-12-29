@@ -7,6 +7,7 @@ import {
   getJobInfoService,
   getJobInfoByIdService,
   getJobInfosService,
+  removeJobInfoService,
 } from "@/core/features/jobInfos/service";
 import {
   UnauthorizedError,
@@ -155,4 +156,12 @@ export async function getJobInfoById(id: string) {
  */
 export async function getJobInfos() {
   return await getJobInfosService();
+}
+
+/**
+ * Remove a job info by ID
+ * Used in pages to remove a job info + all related interviews and questions
+ */
+export async function removeJobInfoAction(id: string) {
+  return await removeJobInfoService(id);
 }
