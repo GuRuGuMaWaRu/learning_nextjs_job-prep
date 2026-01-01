@@ -28,9 +28,12 @@ import { Button } from "@core/components/ui/button";
 import { LoadingSwap } from "@core/components/ui/loading-swap";
 import { experienceLevels, JobInfoTable } from "@/core/drizzle/schema";
 
-import { jobInfoSchema } from "../schemas";
-import { formatExperienceLevel } from "../lib/formatters";
-import { createJobInfoAction, updateJobInfoAction } from "../actions";
+import { jobInfoSchema } from "@/core/features/jobInfos/schemas";
+import { formatExperienceLevel } from "@/core/features/jobInfos/lib/formatters";
+import {
+  createJobInfoAction,
+  updateJobInfoAction,
+} from "@/core/features/jobInfos/actions";
 import { routes } from "@/core/data/routes";
 
 type JobInfoFormData = z.infer<typeof jobInfoSchema>;
@@ -67,6 +70,8 @@ export function JobInfoForm({
       toast.success(
         jobInfo ? "Job information updated!" : "Job information created!"
       );
+
+      form.reset();
       router.push(routes.jobInfo(res.data.id));
     }
   }
