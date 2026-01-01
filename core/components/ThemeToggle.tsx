@@ -51,9 +51,7 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="icon" variant="ghost">
-          {theme === "dark" ? <MoonIcon /> : null}
-          {theme === "light" ? <SunIcon /> : null}
-          {theme === "system" ? <LaptopIcon /> : null}
+          {themes.find((t) => t.value === theme)?.icon}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
