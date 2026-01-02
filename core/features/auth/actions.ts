@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import z from "zod";
 
 import {
   hashPassword,
@@ -21,7 +22,9 @@ import {
 import { generateUserId } from "@/core/features/auth/tokens";
 import { createUserDb, findUserByEmailDb } from "@/core/features/auth/db";
 import { getUser } from "@/core/features/users/actions";
+import { signInSchema } from "@/core/features/auth/schemas";
 import { routes } from "@/core/data/routes";
+import { ActionResult } from "@/core/dal/helpers";
 
 type ActionState = {
   error?: string;
@@ -32,9 +35,6 @@ type ActionState = {
   };
 };
 
-/**
- * Sign up a new user
- */
 export async function signUpAction(
   _prevState: ActionState | null,
   formData: FormData
@@ -96,70 +96,46 @@ export async function signUpAction(
   redirect(routes.app);
 }
 
-/**
- * Sign in an existing user
- */
+export type SignInFormData = z.infer<typeof signInSchema>;
+
 export async function signInAction(
-  _prevState: ActionState | null,
-  formData: FormData
-): Promise<ActionState> {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  // Store fields to return on error
-  const fields = { email };
-
-  // Validate required fields
-  if (!email || !password) {
-    return { error: "Email and password are required", fields };
-  }
+  values: SignInFormData
+): Promise<ActionResult<void>> {
+  const { email, password } = values;
 
   try {
-    // Find user by email
     const user = await findUserByEmailDb(email);
-
     if (!user || !user.passwordHash) {
-      return { error: "Invalid email or password", fields };
+      return { success: false, message: "Invalid email or password" };
     }
 
-    // Verify password
     const isValidPassword = await verifyPassword(password, user.passwordHash);
-
     if (!isValidPassword) {
-      return { error: "Invalid email or password", fields };
+      return { success: false, message: "Invalid email or password" };
     }
 
-    // Create session
     const session = await createSession(user.id);
 
-    // Set session cookie
     await setSessionCookie(session.token, session.expiresAt);
   } catch (error) {
     console.error("Signin error:", error);
-    return { error: "An error occurred during sign in", fields };
+    return { success: false, message: "An error occurred during sign in" };
   }
 
-  redirect(routes.app);
+  return { success: true, data: undefined };
 }
 
-/**
- * Sign out the current user
- */
 export async function signOutAction(): Promise<void> {
   const token = await getSessionToken();
 
   if (token) {
-    // Delete session from database
     await deleteSession(token);
   }
 
-  // Delete session cookie
   await deleteSessionCookie();
 
-  // Revalidate all routes to clear any cached user data
   revalidatePath("/", "layout");
 
-  // Redirect to landing page
   redirect(routes.landing);
 }
 

@@ -1,9 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
 import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Controller } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import { Button } from "@/core/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,12 +14,45 @@ import {
   CardTitle,
 } from "@/core/components/ui/card";
 import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
+import { Button } from "@/core/components/ui/button";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/core/components/ui/field";
+import { LoadingSwap } from "@/core/components/ui/loading-swap";
 import { routes } from "@/core/data/routes";
-import { signInAction } from "@/core/features/auth/actions";
+import {
+  signInAction,
+  type SignInFormData,
+} from "@/core/features/auth/actions";
+import { signInSchema } from "@/core/features/auth/schemas";
 
 export function SignInForm() {
-  const [state, action, isPending] = useActionState(signInAction, null);
+  const router = useRouter();
+
+  const form = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  async function onSubmit(values: SignInFormData) {
+    const res = await signInAction(values);
+
+    if (!res.success) {
+      form.setError("root.serverError", {
+        message: res.message ?? "An error occurred",
+      });
+    } else {
+      router.push(routes.app);
+      form.reset();
+      toast.success("Signed in successfully");
+    }
+  }
 
   return (
     <Card className="w-full max-w-md">
@@ -28,40 +63,63 @@ export function SignInForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={action} className="space-y-4">
-          {state?.error && (
-            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
-              {state.error}
-            </div>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {form.formState.errors.root?.serverError && (
+            <FieldError>
+              {form.formState.errors.root.serverError.message}
+            </FieldError>
           )}
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
+          <FieldGroup>
+            <Controller
+              control={form.control}
               name="email"
-              type="email"
-              placeholder="you@example.com"
-              defaultValue={state?.fields?.email}
-              disabled={isPending}
-              required
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                  />
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
+          </FieldGroup>
+          <FieldGroup>
+            <Controller
+              control={form.control}
               name="password"
-              type="password"
-              placeholder="••••••••"
-              disabled={isPending}
-              required
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="current-password"
+                    type="password"
+                    placeholder="••••••••"
+                  />
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
             />
-          </div>
+          </FieldGroup>
 
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Signing in..." : "Sign In"}
+          <Button
+            disabled={form.formState.isSubmitting}
+            type="submit"
+            className="w-full">
+            <LoadingSwap isLoading={form.formState.isSubmitting}>
+              Sign In
+            </LoadingSwap>
           </Button>
         </form>
 
