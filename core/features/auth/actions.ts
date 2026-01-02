@@ -4,11 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import z from "zod";
 
-import {
-  hashPassword,
-  verifyPassword,
-  validatePassword,
-} from "@/core/features/auth/password";
+import { hashPassword, verifyPassword } from "@/core/features/auth/password";
 import {
   setSessionCookie,
   getSessionToken,
@@ -22,59 +18,28 @@ import {
 import { generateUserId } from "@/core/features/auth/tokens";
 import { createUserDb, findUserByEmailDb } from "@/core/features/auth/db";
 import { getUser } from "@/core/features/users/actions";
-import { signInSchema } from "@/core/features/auth/schemas";
+import { signInSchema, signUpSchema } from "@/core/features/auth/schemas";
 import { routes } from "@/core/data/routes";
 import { ActionResult } from "@/core/dal/helpers";
 
-type ActionState = {
-  error?: string;
-  success?: boolean;
-  fields?: {
-    name?: string;
-    email?: string;
-  };
-};
+export type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export async function signUpAction(
-  _prevState: ActionState | null,
-  formData: FormData
-): Promise<ActionState> {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  // Store fields to return on error
-  const fields = { name, email };
-
-  // Validate required fields
-  if (!name || !email || !password) {
-    return { error: "All fields are required", fields };
-  }
-
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { error: "Invalid email address", fields };
-  }
-
-  // Validate password strength
-  const passwordValidation = validatePassword(password);
-  if (!passwordValidation.isValid) {
-    return { error: passwordValidation.error, fields };
-  }
+  values: SignUpFormData
+): Promise<ActionResult<void>> {
+  const { name, email, password } = values;
 
   try {
-    // Check if user already exists
     const existingUser = await findUserByEmailDb(email);
-
     if (existingUser) {
-      return { error: "An account with this email already exists", fields };
+      return {
+        success: false,
+        message: "An account with this email already exists",
+      };
     }
 
-    // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Create user
     const userId = generateUserId();
     await createUserDb({
       id: userId,
@@ -83,17 +48,15 @@ export async function signUpAction(
       passwordHash,
     });
 
-    // Create session
     const session = await createSession(userId);
 
-    // Set session cookie
     await setSessionCookie(session.token, session.expiresAt);
+
+    return { success: true, data: undefined };
   } catch (error) {
     console.error("Signup error:", error);
-    return { error: "An error occurred during signup", fields };
+    return { success: false, message: "An error occurred during signup" };
   }
-
-  redirect(routes.app);
 }
 
 export type SignInFormData = z.infer<typeof signInSchema>;
