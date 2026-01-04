@@ -19,6 +19,7 @@ import { generateUserId } from "@/core/features/auth/tokens";
 import { createUserDb, findUserByEmailDb } from "@/core/features/auth/db";
 import { getUser } from "@/core/features/users/actions";
 import { signInSchema, signUpSchema } from "@/core/features/auth/schemas";
+import { EMAIL_REGEX } from "@/core/features/auth/constants";
 import { routes } from "@/core/data/routes";
 import { ActionResult } from "@/core/dal/helpers";
 
@@ -33,8 +34,7 @@ export async function signUpAction(
     return { success: false, message: "All fields are required" };
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!EMAIL_REGEX.test(email)) {
     return { success: false, message: "Invalid email address" };
   }
 
@@ -81,6 +81,21 @@ export async function signInAction(
   values: SignInFormData
 ): Promise<ActionResult<void>> {
   const { email, password } = values;
+
+  if (!email || !password) {
+    return { success: false, message: "All fields are required" };
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    return { success: false, message: "Invalid email address" };
+  }
+
+  if (password.length < 8) {
+    return {
+      success: false,
+      message: "Password must be at least 8 characters long",
+    };
+  }
 
   try {
     const user = await findUserByEmailDb(email);

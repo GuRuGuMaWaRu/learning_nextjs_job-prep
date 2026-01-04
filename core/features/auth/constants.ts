@@ -24,3 +24,5 @@ export const COOKIE_OPTIONS = {
   sameSite: "lax" as const,
   path: "/",
 };
+
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
