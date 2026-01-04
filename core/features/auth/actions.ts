@@ -29,6 +29,22 @@ export async function signUpAction(
 ): Promise<ActionResult<void>> {
   const { name, email, password } = values;
 
+  if (!name || !email || !password) {
+    return { success: false, message: "All fields are required" };
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { success: false, message: "Invalid email address" };
+  }
+
+  if (password.length < 8) {
+    return {
+      success: false,
+      message: "Password must be at least 8 characters long",
+    };
+  }
+
   try {
     const existingUser = await findUserByEmailDb(email);
     if (existingUser) {
