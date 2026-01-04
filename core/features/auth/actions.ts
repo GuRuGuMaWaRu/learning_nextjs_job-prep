@@ -29,7 +29,10 @@ export async function signUpAction(
 ): Promise<ActionResult<void>> {
   const parsed = signUpSchema.safeParse(values);
   if (!parsed.success) {
-    return { success: false, message: parsed.error.message };
+    return {
+      success: false,
+      message: "Please check your input and try again.",
+    };
   }
 
   const { name, email, password } = parsed.data;
@@ -71,7 +74,10 @@ export async function signInAction(
 ): Promise<ActionResult<void>> {
   const parsed = signInSchema.safeParse(values);
   if (!parsed.success) {
-    return { success: false, message: parsed.error.message };
+    return {
+      success: false,
+      message: "Please check your input and try again.",
+    };
   }
 
   const { email, password } = parsed.data;
