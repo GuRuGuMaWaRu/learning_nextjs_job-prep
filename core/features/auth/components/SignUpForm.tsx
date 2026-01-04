@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 import { Button } from "@/core/components/ui/button";
 import {
@@ -22,12 +24,20 @@ import {
 } from "@/core/components/ui/field";
 import { LoadingSwap } from "@/core/components/ui/loading-swap";
 import { Input } from "@/core/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/core/components/ui/input-group";
 import { routes } from "@/core/data/routes";
 import { signUpAction, SignUpFormData } from "@/core/features/auth/actions";
-import { signUpSchema } from "../schemas";
+import { signUpSchema } from "@/core/features/auth/schemas";
 
 export function SignUpForm() {
   const router = useRouter();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -118,14 +128,27 @@ export function SignUpForm() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="new-password"
-                    type="text"
-                    placeholder="••••••••"
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="new-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupButton
+                        className="hover:bg-transparent!"
+                        onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? (
+                          <EyeOffIcon className="size-4" />
+                        ) : (
+                          <EyeIcon className="size-4" />
+                        )}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
                   {fieldState.error && (
                     <FieldError>{fieldState.error.message}</FieldError>
                   )}
